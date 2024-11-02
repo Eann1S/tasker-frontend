@@ -1,4 +1,4 @@
-import RegisterForm from "@/components/auth/RegisterForm";
+import LoginForm from "@/components/auth/LoginForm";
 import { buttonVariants } from "@/components/ui/button";
 import {
   CardContent,
@@ -13,19 +13,19 @@ export default function RegisterPage() {
   return (
     <>
       <CardHeader>
-        <CardTitle>Create an account</CardTitle>
+        <CardTitle>Login</CardTitle>
         <CardDescription>
-          Enter your credentials below to create your account
+          Enter your email and password below to login
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <RegisterForm />
+        <LoginForm />
       </CardContent>
       <CardFooter>
-        If you already have an account{" "}
+        If you do not have an account{" "}
         <Link
           className={buttonVariants({ variant: "link" })}
-          href={"/auth/login"}
+          href={"/auth/register"}
         >
           click here
         </Link>
