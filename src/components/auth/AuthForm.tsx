@@ -29,6 +29,11 @@ export default function AuthForm({
         <Button type="submit" className="w-full">
           {buttonText}
         </Button>
+        {form.formState.errors.root && (
+          <FormMessage>
+            {form.formState.errors.root.message}
+          </FormMessage>
+        )}
       </form>
     </Form>
   );

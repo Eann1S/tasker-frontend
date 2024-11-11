@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Sidebar,
   SidebarContent,
@@ -11,15 +13,27 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { ChevronDown, Home, Plus, Search, Settings, User2 } from "lucide-react";
+import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import Link from "next/link";
+} from "../ui/dropdown-menu";
+import { useQuery } from "@tanstack/react-query";
+import { getProfile } from "@/lib/api";
+import useStore from "@/store/useStore";
 
 export function AppSidebar() {
+  const { accessToken } = useStore();
+
+  const { data: user, isSuccess } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      return await getProfile(accessToken as string);
+    },
+  });
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -28,7 +42,7 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> Username
+                  <User2 /> {!isSuccess ? "Loading..." : user.username}
                   <ChevronDown className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
