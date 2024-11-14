@@ -4,27 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import AuthForm, { Field } from "./AuthForm";
 import { LoginSchema, loginSchema } from "@/lib/zod";
-import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { loginUser } from "@/lib/api";
-import useStore from "@/store/useStore";
+import useLogin from "@/hooks/useLogin";
 
 export default function LoginForm() {
-  const router = useRouter();
-  const { setTokens } = useStore();
-
-  const mutation = useMutation({
-    mutationFn: loginUser,
-    onSuccess(data) {
-      setTokens(data);
-      router.push("/app/tasks");
-    },
-    onError(error) {
-      console.log(error);
-      form.setError("root", { message: error.message });
-    },
-  });
-
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -32,6 +14,8 @@ export default function LoginForm() {
       password: "",
     },
   });
+
+  const mutation = useLogin(form);
 
   async function onSubmit(data: LoginSchema) {
     await mutation.mutateAsync(data);

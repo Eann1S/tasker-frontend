@@ -20,25 +20,24 @@ export const loginUser = async (data: LoginSchema) => {
   return res;
 };
 
-export const refresh_token = async (refreshToken: string) => {
+export const logoutUser = async () => {
+  console.log(`attempting to logout user`);
+  const { data: res } = await axiosInstance.post<void>(`/auth/logout`, {});
+  return res;
+};
+
+export const refreshAccesstoken = async () => {
   console.log(`attempting to refresh token`);
   const { data: res } = await axiosInstance.post<JwtDto>(
-    `/auth/refresh-token`,
-    getHeaders(refreshToken)
+    `/auth/refresh-tokens`,
+    {},
+    { withCredentials: true }
   );
   return res;
 };
 
-export const getProfile = async (accessToken: string) => {
+export const getProfile = async () => {
   console.log(`attempting to get profile`);
-  const { data: res } = await axiosInstance.get<UserDto>(`/users/me`, getHeaders(accessToken));
+  const { data: res } = await axiosInstance.get<UserDto>(`/users/me`);
   return res;
 };
-
-function getHeaders(token: string) {
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-}

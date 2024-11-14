@@ -1,19 +1,16 @@
-import { JwtDto } from "@/lib/types";
 import { create } from "zustand";
 
-const useStore = create<Store>((set) => ({
+const useAuthStore = create<AuthStore>((set) => ({
   accessToken: undefined,
-  refreshToken: undefined,
-  setTokens: (jwtDto: JwtDto) =>
-    set({ accessToken: jwtDto.accessToken, refreshToken: jwtDto.refreshToken }),
-  logout: () => set({ accessToken: undefined, refreshToken: undefined }),
+  setToken: (token: string) =>
+    set({ accessToken: token }),
+  logout: () => set({ accessToken: undefined }),
 }));
 
-export type Store = {
+export type AuthStore = {
   accessToken?: string;
-  refreshToken?: string;
-  setTokens: (jwtDto: JwtDto) => void;
+  setToken: (token: string) => void;
   logout: () => void;
 };
 
-export default useStore;
+export default useAuthStore;

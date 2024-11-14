@@ -20,19 +20,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { useQuery } from "@tanstack/react-query";
-import { getProfile } from "@/lib/api";
-import useStore from "@/store/useStore";
+import useGetProfile from "@/hooks/useGetProfile";
+import useLogout from "@/hooks/useLogout";
 
 export function AppSidebar() {
-  const { accessToken } = useStore();
-
-  const { data: user, isSuccess } = useQuery({
-    queryKey: ["profile"],
-    queryFn: async () => {
-      return await getProfile(accessToken as string);
-    },
-  });
+  const { data: user } = useGetProfile();
 
   return (
     <Sidebar>
@@ -42,7 +34,7 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> {!isSuccess ? "Loading..." : user.username}
+                  <User2 /> {user?.username}
                   <ChevronDown className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -54,7 +46,7 @@ export function AppSidebar() {
                   <span>Account</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <span>Sign out</span>
+                  <LogoutButton />
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -112,3 +104,18 @@ const items = [
     icon: Settings,
   },
 ];
+
+function LogoutButton() {
+  const mutation = useLogout();
+
+  return (
+    <button
+      onClick={async (e) => {
+        e.preventDefault();
+        await mutation.mutateAsync();
+      }}
+    >
+      Log out
+    </button>
+  );
+}

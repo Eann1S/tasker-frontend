@@ -6,5 +6,4 @@ export type UserDto = {
 
 export type JwtDto = {
     accessToken: string;
-    refreshToken: string;
 }
