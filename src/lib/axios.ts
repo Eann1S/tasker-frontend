@@ -1,6 +1,8 @@
+'use server'
+
 import axios from "axios";
+import { cookies } from "next/headers";
 import { refreshAccesstoken } from "./api";
-import useAuthStore from "@/store/useStore";
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
@@ -11,7 +13,7 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   async (config) => {
-    const { accessToken } = useAuthStore.getState();
+    const accessToken = cookies().get("accessToken")?.value;
     if (accessToken) {
       config.headers["Authorization"] = `Bearer ${accessToken}`;
     }
@@ -36,12 +38,9 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     if (error.response.status === 401 && !originalRequest._retry) {
-      const { setToken } = useAuthStore.getState();
-
       try {
-        const { accessToken } = await refreshAccesstoken();
+        const accessToken = await refreshAccesstoken();
         axiosInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-        setToken(accessToken);
         return axiosInstance(originalRequest);
       } catch (e) {
         return Promise.reject(e);
