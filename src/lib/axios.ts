@@ -1,4 +1,4 @@
-'use server'
+"use server";
 
 import axios from "axios";
 import { cookies } from "next/headers";
@@ -26,34 +26,26 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (!originalRequest._retry) {
-      originalRequest._retry = true;
-    }
-    return Promise.reject(error);
-  }
-);
+    
+    const notLoginRequest = !originalRequest.url.includes('/login');
+    const notRetry = !originalRequest._retry;
+    const unauthorizedStatus = error.response.status === 401;
 
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (unauthorizedStatus && notRetry && notLoginRequest) {
+      originalRequest._retry = true;
       try {
-        const accessToken = await refreshAccesstoken();
+        const { accessToken } = await refreshAccesstoken();
         axiosInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
         return axiosInstance(originalRequest);
-      } catch (e) {
-        return Promise.reject(e);
+      } catch (e: any) {
+        console.error(e);
+        return Promise.reject(new Error(error.message));
       }
     }
-    return Promise.reject(error);
-  }
-);
-
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    return Promise.reject(new Error(error.response.data.message));
+    console.error(error.response.data.message || error.message);
+    return Promise.reject(
+      new Error(error.response.data.message || error.message || "An error occured")
+    );
   }
 );
 
